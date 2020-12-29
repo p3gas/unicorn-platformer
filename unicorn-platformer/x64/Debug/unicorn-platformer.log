@@ -1,0 +1,3 @@
+﻿  main.cpp
+D:\Projekty\unicorn-platformer\unicorn-platformer\main.cpp(30,51): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
+  unicorn-platformer.vcxproj -> D:\Projekty\unicorn-platformer\x64\Debug\unicorn-platformer.exe
