@@ -6,6 +6,10 @@
 GameManager::GameManager(Configuration* configuration)
 {
 	this->configuration = configuration;
+	this->camera.x = configuration->screenWidth / 2;
+	this->camera.y = configuration->screenHeight / 2;
+	this->camera.w = configuration->screenWidth;
+	this->camera.h = configuration->screenHeight;
 }
 
 int GameManager::Init()
@@ -48,6 +52,15 @@ int GameManager::LoadResources()
 		printf("Unable to load texture from: %s\n", this->configuration->backgroundTexturePath);
 		return 10;
 	}
+	this->platforms = new SDL_Rect[2];
+	this->platforms[0].x = 60;
+	this->platforms[0].y = 60;
+	this->platforms[0].w = 100;
+	this->platforms[0].h = 20;
+	this->platforms[1].x = 460;
+	this->platforms[1].y = 660;
+	this->platforms[1].w = 100;
+	this->platforms[1].h = 20;
 	return 0;
 }
 
@@ -74,16 +87,39 @@ void GameManager::ProcessInput()
 	}
 }
 
-void GameManager::Update(float deltaTime)
+void GameManager::Update(int deltaTime)
 {
-	this->timer += deltaTime;
-	printf("%f\n", this->timer);
+	this->timer += deltaTime / 1000.f;
+	this->player.Update(deltaTime);
+	this->camera.x = this->player.GetOriginX() - this->configuration->screenWidth / 2;
+	this->camera.y = this->player.GetOriginY() - this->configuration->screenHeight / 2;
+	//if (this->camera.x < 0)
+	//{
+	//	this->camera.x = 0;
+	//}
+	//if (this->camera.y < 0)
+	//{
+	//	this->camera.y = 0;
+	//}
+	printf("x=%d y=%d\n", camera.x, camera.y);
 }
 
 void GameManager::Render()
 {
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(this->renderer);
 	SDL_RenderCopy(this->renderer, this->backgroundTexture, NULL, NULL);
+	this->player.Draw(this->renderer, &this->camera);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+	for (int i = 0; i < 2; i++)
+	{
+		SDL_Rect objectToBeDrew;
+		objectToBeDrew.w = this->platforms[i].w;
+		objectToBeDrew.h = this->platforms[i].h;
+		objectToBeDrew.x = this->platforms[i].x - this->camera.x;
+		objectToBeDrew.y = this->platforms[i].y - this->camera.y;
+		SDL_RenderDrawRect(this->renderer, &objectToBeDrew);
+	}
 	SDL_RenderPresent(this->renderer);
 }
 
@@ -95,6 +131,8 @@ void GameManager::Quit()
 	this->window = NULL;
 	SDL_DestroyRenderer(this->renderer);
 	this->renderer = NULL;
+
+	delete[]this->platforms;
 
 	IMG_Quit();
 	SDL_Quit();

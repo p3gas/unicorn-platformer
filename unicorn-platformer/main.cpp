@@ -32,7 +32,7 @@ int main(int argc, char* args[])
 		}
 		lastTime = SDL_GetTicks();
 		gameManager.ProcessInput();
-		gameManager.Update(milisecondsElapsed / 1000.0f);
+		gameManager.Update(milisecondsElapsed);
 		gameManager.Render();
 	}
 	gameManager.Quit();

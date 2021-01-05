@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include "Configuration.h"
+#include "Player.h"
 
 class GameManager
 {
@@ -10,6 +11,9 @@ private:
 	SDL_Renderer* renderer = NULL;
 	Configuration* configuration;
 	SDL_Texture* backgroundTexture = NULL;
+	Player player;
+	SDL_Rect camera;
+	SDL_Rect* platforms = NULL;
 	bool isRunning = false;
 	float timer = 0.0f;
 public:
@@ -17,7 +21,7 @@ public:
 	int Init();
 	int LoadResources();
 	void ProcessInput();
-	void Update(float deltaTime);
+	void Update(int deltaTime);
 	void Render();
 	void Quit();
 	bool IsRunning();
