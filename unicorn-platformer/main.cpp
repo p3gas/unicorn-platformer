@@ -23,6 +23,7 @@ int main(int argc, char* args[])
 		}
 	}
 	Uint32 lastTime = SDL_GetTicks();
+	gameManager.RestartGame();
 	while (gameManager.IsRunning()) {
 		int milisecondsElapsed = SDL_GetTicks() - lastTime;
 		if (milisecondsElapsed < 1000 / float(configuration.fpsLimit))

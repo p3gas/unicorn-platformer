@@ -1,7 +1,12 @@
 #pragma once
 #include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <stdio.h>
 #include "Configuration.h"
 #include "Player.h"
+#include "World.h"
+#include "TextPrinter.h"
 
 class GameManager
 {
@@ -13,7 +18,8 @@ private:
 	SDL_Texture* backgroundTexture = NULL;
 	Player player;
 	SDL_Rect camera;
-	SDL_Rect* platforms = NULL;
+	World world;
+	TextPrinter textPrinter;
 	bool isRunning = false;
 	float timer = 0.0f;
 public:
@@ -25,6 +31,7 @@ public:
 	void Render();
 	void Quit();
 	bool IsRunning();
+	void RestartGame();
 private:
 	SDL_Texture* LoadTexture(const char* path);
 };

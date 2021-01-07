@@ -3,21 +3,9 @@
 Player::Player()
 {
 	body = SDL_Rect();
-	body.x = 0;
-	body.y = 0;
 	body.w = 200;
-	body.h = 100;
+	body.h = 164;
 	speed = 0.5f;
-}
-
-Player::Player(int x, int y, int width, int height, float speed)
-{
-	body = SDL_Rect();
-	body.x = x;
-	body.y = y;
-	body.w = width;
-	body.h = height;
-	this->speed = speed;
 }
 
 void Player::Move(int x, int y)
@@ -37,11 +25,9 @@ void Player::Draw(SDL_Renderer* renderer, const SDL_Rect* camera)
 	SDL_Rect objectToBeDrew;
 	objectToBeDrew.w = this->body.w;
 	objectToBeDrew.h = this->body.h;
-	objectToBeDrew.x = camera->x;
-	objectToBeDrew.y = camera->y;
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	//SDL_RenderDrawRect(renderer, &this->body);
-	SDL_RenderDrawRect(renderer, &objectToBeDrew);
+	objectToBeDrew.x = this->body.x - camera->x;
+	objectToBeDrew.y = this->body.y - camera->y;
+	SDL_RenderCopy(renderer, this->texture, NULL, &objectToBeDrew);
 }
 
 void Player::Update(int deltaTime)
@@ -72,14 +58,38 @@ void Player::Update(int deltaTime)
 	}
 
 	this->Move(int(x), int(y));
+	if (this->body.x < 0)
+	{
+		this->body.x = 0;
+	}
+	if (this->body.y < 0)
+	{
+		this->body.y = 0;
+	}
 }
 
 int Player::GetOriginX()
 {
-	return (this->body.x + this->body.w) / 2;
+	return this->body.x + this->body.w / 2;
 }
 
 int Player::GetOriginY()
 {
-	return (this->body.y + this->body.h) / 2;
+	return this->body.y + this->body.h / 2;
+}
+
+SDL_Rect Player::GetBody()
+{
+	return this->body;
+}
+
+void Player::SetTexture(SDL_Texture* texture)
+{
+	this->texture = texture;
+}
+
+void Player::Destroy()
+{
+	SDL_DestroyTexture(this->texture);
+	this->texture = NULL;
 }

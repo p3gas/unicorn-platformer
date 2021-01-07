@@ -1,2 +1,5 @@
-﻿  Player.cpp
-  unicorn-platformer.vcxproj -> D:\Projekty\unicorn-platformer\x64\Debug\unicorn-platformer.exe
+﻿  GameManager.cpp
+  main.cpp
+E:\Projekty\unicorn-platformer\unicorn-platformer\main.cpp(31,51): warning C4244: "argument": konwersja z "float" do "Uint32", możliwa utrata danych
+  Generowanie kodu...
+  unicorn-platformer.vcxproj -> E:\Projekty\unicorn-platformer\x64\Debug\unicorn-platformer.exe
