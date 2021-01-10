@@ -1,25 +1,34 @@
 #include "World.h"
 #include <stdio.h>
 
-void World::Build()
+void World::Build(SDL_Texture* starTexture, SDL_Texture* stalactiteTexture)
 {
-	this->numberOfPlatforms = 4;
+	this->starTexture = starTexture;
+	this->stalactiteTexture = stalactiteTexture;
+
 	this->levelWidth = 5040;
+	this->levelHeight = 1700;
 	this->startPosition = SDL_Point{ 0, 1500 };
+
+	this->numberOfPlatforms = 4;
 	this->platforms = new SDL_Rect[this->numberOfPlatforms];
 	this->platforms[0] = SDL_Rect{ 0, 1500, 5040, 80 };
 	this->platforms[1] = SDL_Rect{ 5040, 1500, 1280, 80 };
 	this->platforms[2] = SDL_Rect{ 1700, 1200, 1280, 80 };
 	this->platforms[3] = SDL_Rect{ -256, 1500, 256, 80 };
 
-	this->numberOfObstacles = 6;
-	this->stars = new SDL_Rect[this->numberOfObstacles];
-	this->stars[0] = SDL_Rect{ 800, 1400, 100, 100 };
-	this->stars[1] = SDL_Rect{ 1900, 1000, 100, 100 };
-	this->stars[2] = SDL_Rect{ 3100, 1350, 100, 100 };
-	this->stars[3] = SDL_Rect{ 4000, 900, 100, 100 };
-	this->stars[4] = SDL_Rect{ 4700, 1200, 100, 100 };
-	this->stars[5] = SDL_Rect{ 5840, 1400, 100, 100 };
+	this->numberOfStars = 6;
+	this->stars = new Obstacle[this->numberOfStars];
+	this->stars[0] = Obstacle(800, 1400, 100, 100, starTexture);
+	this->stars[1] = Obstacle(1900, 1000, 100, 100, starTexture);
+	this->stars[2] = Obstacle(3100, 1350, 100, 100, starTexture);
+	this->stars[3] = Obstacle(4000, 900, 100, 100, starTexture);
+	this->stars[4] = Obstacle(4700, 1200, 100, 100, starTexture);
+	this->stars[5] = Obstacle(5840, 1400, 100, 100, starTexture);
+
+	this->numberOfStalactites = 1;
+	this->stalactites = new Obstacle[this->numberOfStalactites];
+	this->stalactites[0] = Obstacle(1700, 1000, 50, 150, stalactiteTexture);
 }
 
 void World::Draw(SDL_Renderer* renderer, const SDL_Rect* camera)
@@ -34,17 +43,13 @@ void World::Draw(SDL_Renderer* renderer, const SDL_Rect* camera)
 		SDL_SetRenderDrawColor(renderer, 102, 204, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderFillRect(renderer, &objectToBeDrew);
 	}
-	for (int i = 0; i < this->numberOfObstacles; i++)
+	for (int i = 0; i < this->numberOfStars; i++)
 	{
-		SDL_Rect objectToBeDrew;
-		objectToBeDrew.w = this->stars[i].w;
-		objectToBeDrew.h = this->stars[i].h;
-		objectToBeDrew.x = this->stars[i].x - camera->x;
-		objectToBeDrew.y = this->stars[i].y - camera->y;
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-		SDL_RenderFillRect(renderer, &objectToBeDrew);
-		SDL_SetRenderDrawColor(renderer, 255, 255, 0, SDL_ALPHA_OPAQUE);
-		SDL_RenderDrawRect(renderer, &objectToBeDrew);
+		this->stars[i].Draw(renderer, camera);
+	}
+	for (int i = 0; i < this->numberOfStalactites; i++)
+	{
+		this->stalactites[i].Draw(renderer, camera);
 	}
 }
 
@@ -62,6 +67,11 @@ void World::Destroy()
 {
 	delete[]this->platforms;
 	delete[]this->stars;
+	delete[]this->stalactites;
+	SDL_DestroyTexture(this->starTexture);
+	this->starTexture = NULL;
+	SDL_DestroyTexture(this->stalactiteTexture);
+	this->stalactiteTexture = NULL;
 }
 
 int World::AdjustPlayerPosition(Player* player)
@@ -86,7 +96,10 @@ int World::AdjustPlayerPosition(Player* player)
 	if (player->GetBody().x > this->levelWidth)
 	{
 		player->SetPosition(player->GetBody().x - this->levelWidth, player->GetBody().y);
-
+	}
+	if (player->GetBody().y + player->GetBody().h > this->levelHeight)
+	{
+		return PLAYER_DEATH;
 	}
 	
 	if (isPlayerGrounded)
@@ -103,10 +116,23 @@ int World::AdjustPlayerPosition(Player* player)
 
 bool World::IsCollidingWithStar(Player* player)
 {
-	for (int i = 0; i < this->numberOfObstacles; i++)
+	for (int i = 0; i < this->numberOfStars; i++)
 	{
-		int intersectionType = this->CheckIntersection(*player, this->stars[i]);
+		int intersectionType = this->CheckIntersection(*player, this->stars[i].GetBody());
 		if (intersectionType != NONE && intersectionType != INNER)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool World::IsCollidingWithStalactite(Player* player)
+{
+	for (int i = 0; i < this->numberOfStalactites; i++)
+	{
+		int intersectionType = this->CheckIntersection(*player, this->stalactites[i].GetBody());
+		if (intersectionType != NONE)
 		{
 			return true;
 		}
@@ -140,8 +166,6 @@ int World::CheckIntersection(Player player, SDL_Rect obstacle)
 		{
 			return FROM_RIGHT;
 		}
-		printf("LEFT DATA:\nw = %d, obs.x = %d\n", player.GetBody().w, obstacle.x);
-		printf("INNER:\nx = %d, o_x = %d\ny = %d, o_y = %d\n\n", player.GetBody().x, player.GetOldPosition().x, player.GetBody().y, player.GetOldPosition().y);
 		return INNER;
 	}
 	return NONE;

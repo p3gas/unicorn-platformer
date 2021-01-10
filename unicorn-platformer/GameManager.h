@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "World.h"
 #include "TextPrinter.h"
+#include "TopBar.h"
 
 class GameManager
 {
@@ -20,7 +21,7 @@ private:
 	Player player;
 	SDL_Rect camera;
 	World world;
-	TextPrinter textPrinter;
+	TopBar topBar;
 	bool isRunning = false;
 	float timer = 0.0f;
 	int gameState;

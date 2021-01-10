@@ -40,6 +40,7 @@ int GameManager::Init()
 		printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
 		return 5;
 	}
+	this->topBar.Init(this->configuration);
 	this->isRunning = true;
 
 	return 0;
@@ -59,8 +60,8 @@ int GameManager::LoadResources()
 		printf("Unable to load texture from: %s\n", this->configuration->menuTexturePath);
 		return 11;
 	}
-	this->world.Build();
-	this->textPrinter.LoadFont(this->configuration->pathToFont);
+	this->world.Build(this->LoadTexture(this->configuration->starTexturePath), this->LoadTexture(this->configuration->stalactiteTexturePath));
+	this->topBar.LoadResources(this->configuration);
 	this->player.SetTexture(this->LoadTexture(this->configuration->playerTexturePath));
 	return 0;
 }
@@ -129,6 +130,14 @@ void GameManager::Update(int deltaTime)
 			}
 			this->RestartGame();
 		}
+		if (this->world.IsCollidingWithStalactite(&this->player))
+		{
+			if (this->player.Dies())
+			{
+				this->gameState = MENU;
+			}
+			this->RestartGame();
+		}
 
 		this->camera.x = this->player.GetOriginX() - this->configuration->screenWidth / 8;
 		this->camera.y = this->player.GetOriginY() - this->configuration->screenHeight / 2;
@@ -150,20 +159,7 @@ void GameManager::Render()
 		this->player.Draw(this->renderer, &this->camera);
 		SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 		this->world.Draw(this->renderer, &this->camera);
-
-		SDL_Rect topBar;
-		topBar.x = 0;
-		topBar.y = 0;
-		topBar.w = this->configuration->screenWidth;
-		topBar.h = this->configuration->topBarHight;
-		SDL_SetRenderDrawColor(this->renderer, 150, 0, 255, SDL_ALPHA_OPAQUE);
-		SDL_RenderFillRect(this->renderer, &topBar);
-		char textTimer[8];
-		sprintf(textTimer, "%05.1f", this->timer);
-		this->textPrinter.Draw(this->renderer, SDL_Color{255, 255, 255, 255}, textTimer, SDL_Rect{ this->configuration->screenWidth - 200, 0, 200, 100 });
-		char lives[3];
-		sprintf(lives, "%d", this->player.GetNumberOfLives());
-		this->textPrinter.Draw(this->renderer, SDL_Color{255, 255, 255, 255}, lives, SDL_Rect{ 0, 0, 200, 100 });
+		this->topBar.Render(this->renderer, this->timer, this->player.GetNumberOfLives());
 	}
 	else if (this->gameState == MENU)
 	{
@@ -184,7 +180,7 @@ void GameManager::Quit()
 	SDL_DestroyRenderer(this->renderer);
 	this->renderer = NULL;
 
-	this->textPrinter.Quit();
+	this->topBar.Quit();
 	this->player.Destroy();
 	this->world.Destroy();
 

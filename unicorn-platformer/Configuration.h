@@ -8,6 +8,8 @@ public:
 	const char* backgroundTexturePath = "images/background.png";
 	const char* menuTexturePath = "images/menuBackground.png";
 	const char* playerTexturePath = "images/unicorn.png";
+	const char* starTexturePath = "images/star.png";
+	const char* stalactiteTexturePath = "images/stalaktyt.png";
 	const char* pathToFont = "fonts/ui_font.ttf";
 	const int fpsLimit = 300;
 };

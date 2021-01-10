@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include "Player.h"
+#include "Obstacle.h"
 
 enum WorldEvent {
 	NOTHING,
@@ -13,18 +14,23 @@ private:
 	int levelWidth;
 	int levelHeight;
 	int numberOfPlatforms;
-	int numberOfObstacles;
+	int numberOfStars;
+	int numberOfStalactites;
 	SDL_Point startPosition;
 	SDL_Rect* platforms = NULL;
-	SDL_Rect* stars = NULL;
+	Obstacle* stars = NULL;
+	Obstacle* stalactites = NULL;
+	SDL_Texture* starTexture = NULL;
+	SDL_Texture* stalactiteTexture = NULL;
 public:
 	int GetLevelWidth();
 	int GetLevelHeight();
-	void Build();
+	void Build(SDL_Texture* starTexture, SDL_Texture* stalactiteTexture);
 	void Draw(SDL_Renderer *renderer, const SDL_Rect* camera);
 	void Destroy();
 	int AdjustPlayerPosition(Player* player);
 	bool IsCollidingWithStar(Player* player);
+	bool IsCollidingWithStalactite(Player* player);
 	SDL_Point GetStartPosition();
 private:
 	int CheckIntersection(Player player, SDL_Rect obstacle);
