@@ -6,25 +6,32 @@ void World::Build(SDL_Texture* starTexture, SDL_Texture* stalactiteTexture)
 	this->starTexture = starTexture;
 	this->stalactiteTexture = stalactiteTexture;
 
-	this->levelWidth = 5040;
-	this->levelHeight = 1700;
-	this->startPosition = SDL_Point{ 0, 1500 };
-
-	this->numberOfPlatforms = 4;
+	this->numberOfPlatforms = 13;
+	this->levelWidth = 7680;
+	this->levelHeight = 2160;
+	this->startPosition = SDL_Point{ 0, 1160 };
 	this->platforms = new SDL_Rect[this->numberOfPlatforms];
-	this->platforms[0] = SDL_Rect{ 0, 1500, 5040, 80 };
-	this->platforms[1] = SDL_Rect{ 5040, 1500, 1280, 80 };
-	this->platforms[2] = SDL_Rect{ 1700, 1200, 1280, 80 };
-	this->platforms[3] = SDL_Rect{ -256, 1500, 256, 80 };
+	this->platforms[0] = SDL_Rect{ 0, 1160, 640, 278 };
+	this->platforms[1] = SDL_Rect{ 640, 1000, 1200, 278 };
+	this->platforms[2] = SDL_Rect{ 940, 510, 640, 160 };
+	this->platforms[3] = SDL_Rect{ 2100, 1160, 640, 278 };
+	this->platforms[4] = SDL_Rect{ 3100, 1410, 1000, 278 };
+	this->platforms[5] = SDL_Rect{ 3200, 860, 300, 200 };
+	this->platforms[6] = SDL_Rect{ 3900, 1060, 1000, 170 };
+	this->platforms[7] = SDL_Rect{ 4800, 810, 700, 278 };
+	this->platforms[8] = SDL_Rect{ 5600, 1010, 1400, 278 };
+	this->platforms[9] = SDL_Rect{ 7360, 1160, 320, 278 };
+	this->platforms[10] = SDL_Rect{ 7680, 1160, 640, 278 };
+	this->platforms[11] = SDL_Rect{ 8320, 1000, 700, 278 };
+	this->platforms[12] = SDL_Rect{ -160, 1160, 160, 278 };
 
-	this->numberOfStars = 6;
+	this->numberOfStars = 5;
 	this->stars = new Obstacle[this->numberOfStars];
-	this->stars[0] = Obstacle(800, 1400, 100, 100, starTexture);
-	this->stars[1] = Obstacle(1900, 1000, 100, 100, starTexture);
-	this->stars[2] = Obstacle(3100, 1350, 100, 100, starTexture);
-	this->stars[3] = Obstacle(4000, 900, 100, 100, starTexture);
-	this->stars[4] = Obstacle(4700, 1200, 100, 100, starTexture);
-	this->stars[5] = Obstacle(5840, 1400, 100, 100, starTexture);
+	this->stars[0] = Obstacle( 2370, 1060, 100, 100, starTexture);
+	this->stars[1] = Obstacle( 3100, 1350, 100, 100, starTexture);
+	this->stars[2] = Obstacle( 4000, 900, 100, 100, starTexture);
+	this->stars[3] = Obstacle( 4700, 1200, 100, 100, starTexture);
+	this->stars[4] = Obstacle( 5840, 1400, 100, 100, starTexture);
 
 	this->numberOfStalactites = 1;
 	this->stalactites = new Obstacle[this->numberOfStalactites];
