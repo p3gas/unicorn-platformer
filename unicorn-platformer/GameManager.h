@@ -18,6 +18,7 @@ private:
 	Configuration* configuration;
 	SDL_Texture* backgroundTexture = NULL;
 	SDL_Texture* menuTexture = NULL;
+	SDL_Texture* confirmationTexture = NULL;
 	Player player;
 	SDL_Rect camera;
 	World world;
@@ -41,5 +42,6 @@ private:
 
 enum GameState {
 	MENU = 1,
-	GAME
+	GAME,
+	CONFIRMATION
 };

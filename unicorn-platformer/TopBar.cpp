@@ -15,17 +15,23 @@ void TopBar::Render(SDL_Renderer* renderer, float timer, int numberOfLives)
 	char textTimer[8];
 	sprintf(textTimer, "%05.1f", timer);
 	this->textPrinter.Draw(renderer, SDL_Color{255, 255, 255, 255}, textTimer, SDL_Rect{ this->bar.w - 200, 0, 200, 100 });
-	char lives[3];
-	sprintf(lives, "%d", numberOfLives);
-	this->textPrinter.Draw(renderer, SDL_Color{255, 255, 255, 255}, lives, SDL_Rect{ 0, 0, 50, 100 });
+	SDL_Rect heartLocation = SDL_Rect{ 10, 10, 80, 80 };
+	for (int i = 0; i < numberOfLives; i++)
+	{
+		SDL_RenderCopy(renderer, this->heartTexture, NULL, &heartLocation);
+		heartLocation.x += 110;
+	}
 }
 
-void TopBar::LoadResources(const Configuration* configuration)
+void TopBar::LoadResources(const Configuration* configuration, SDL_Texture* heartTexture)
 {
 	this->textPrinter.LoadFont(configuration->pathToFont);
+	this->heartTexture = heartTexture;
 }
 
 void TopBar::Quit()
 {
+	SDL_DestroyTexture(this->heartTexture);
+	this->heartTexture = NULL;
 	this->textPrinter.Quit();
 }

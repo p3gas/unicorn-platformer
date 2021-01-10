@@ -60,8 +60,9 @@ int GameManager::LoadResources()
 		printf("Unable to load texture from: %s\n", this->configuration->menuTexturePath);
 		return 11;
 	}
+	this->confirmationTexture = this->LoadTexture(this->configuration->confirmationTexturePath);
 	this->world.Build(this->LoadTexture(this->configuration->starTexturePath), this->LoadTexture(this->configuration->stalactiteTexturePath));
-	this->topBar.LoadResources(this->configuration);
+	this->topBar.LoadResources(this->configuration, this->LoadTexture(this->configuration->heartTexturePath));
 	this->player.SetTexture(this->LoadTexture(this->configuration->playerTexturePath));
 	return 0;
 }
@@ -82,10 +83,17 @@ void GameManager::ProcessInput()
 				this->isRunning = false;
 				break;
 			case SDLK_n:
-				if (this->gameState == GAME)
+				if (this->gameState == GAME || this->gameState == CONFIRMATION)
 				{
 					this->RestartGame();
 					this->player.ResetLives();
+					this->gameState = GAME;
+				}
+				break;
+			case SDLK_y:
+				if (this->gameState == CONFIRMATION)
+				{
+					this->gameState = GAME;
 				}
 				break;
 			case SDLK_d:
@@ -102,7 +110,7 @@ void GameManager::ProcessInput()
 					this->gameState = GAME;
 				}
 				break;
-			}			
+			}
 		}
 	}
 }
@@ -120,6 +128,10 @@ void GameManager::Update(int deltaTime)
 			{
 				this->gameState = MENU;
 			}
+			else
+			{
+				this->gameState = CONFIRMATION;
+			}
 			this->RestartGame();
 		}
 		if (!this->player.IsDashing() && this->world.IsCollidingWithStar(&this->player))
@@ -128,6 +140,10 @@ void GameManager::Update(int deltaTime)
 			{
 				this->gameState = MENU;
 			}
+			else
+			{
+				this->gameState = CONFIRMATION;
+			}
 			this->RestartGame();
 		}
 		if (this->world.IsCollidingWithStalactite(&this->player))
@@ -135,6 +151,10 @@ void GameManager::Update(int deltaTime)
 			if (this->player.Dies())
 			{
 				this->gameState = MENU;
+			}
+			else
+			{
+				this->gameState = CONFIRMATION;
 			}
 			this->RestartGame();
 		}
@@ -165,6 +185,10 @@ void GameManager::Render()
 	{
 		SDL_RenderCopy(this->renderer, this->menuTexture, NULL, NULL);
 	}
+	else if (this->gameState == CONFIRMATION)
+	{
+		SDL_RenderCopy(this->renderer, this->confirmationTexture, NULL, NULL);
+	}
 
 	SDL_RenderPresent(this->renderer);
 }
@@ -175,6 +199,8 @@ void GameManager::Quit()
 	this->backgroundTexture = NULL;
 	SDL_DestroyTexture(this->menuTexture);
 	this->menuTexture = NULL;
+	SDL_DestroyTexture(this->confirmationTexture);
+	this->confirmationTexture = NULL;
 	SDL_DestroyWindow(this->window);
 	this->window = NULL;
 	SDL_DestroyRenderer(this->renderer);

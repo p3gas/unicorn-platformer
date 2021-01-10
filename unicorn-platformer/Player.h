@@ -21,7 +21,6 @@ private:
 	float aMaxSpeed;
 	float aAccelration;
 	int lives;
-	// JUMPING
 	float gravity;
 	float jumpForce;
 	bool isJumping;
@@ -29,8 +28,6 @@ private:
 	int jumpRange;
 	int jumpTraveled;
 	bool jumpKeyIsHold;
-	// END OF JUMPING
-	// DASH
 	bool isDashing;
 	int dashRange;
 	int dashTraveled;

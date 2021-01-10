@@ -16,7 +16,7 @@ void World::Build(SDL_Texture* starTexture, SDL_Texture* stalactiteTexture)
 	this->platforms[2] = SDL_Rect{ 940, 510, 640, 160 };
 	this->platforms[3] = SDL_Rect{ 2100, 1160, 640, 278 };
 	this->platforms[4] = SDL_Rect{ 3100, 1410, 1000, 278 };
-	this->platforms[5] = SDL_Rect{ 3200, 860, 300, 200 };
+	this->platforms[5] = SDL_Rect{ 3200, 860, 250, 200 };
 	this->platforms[6] = SDL_Rect{ 3900, 1060, 1000, 170 };
 	this->platforms[7] = SDL_Rect{ 4800, 810, 700, 278 };
 	this->platforms[8] = SDL_Rect{ 5600, 1010, 1400, 278 };
@@ -25,17 +25,21 @@ void World::Build(SDL_Texture* starTexture, SDL_Texture* stalactiteTexture)
 	this->platforms[11] = SDL_Rect{ 8320, 1000, 700, 278 };
 	this->platforms[12] = SDL_Rect{ -160, 1160, 160, 278 };
 
-	this->numberOfStars = 5;
+	this->numberOfStars = 4;
 	this->stars = new Obstacle[this->numberOfStars];
-	this->stars[0] = Obstacle( 2370, 1060, 100, 100, starTexture);
-	this->stars[1] = Obstacle( 3100, 1350, 100, 100, starTexture);
-	this->stars[2] = Obstacle( 4000, 900, 100, 100, starTexture);
-	this->stars[3] = Obstacle( 4700, 1200, 100, 100, starTexture);
-	this->stars[4] = Obstacle( 5840, 1400, 100, 100, starTexture);
+	this->stars[0] = Obstacle(2320, 960, 200, 200, starTexture);
+	this->stars[1] = Obstacle(3250, 710, 150, 150, starTexture);
+	this->stars[2] = Obstacle(6000, 860, 150, 150, starTexture);
+	this->stars[3] = Obstacle(6450, 860, 150, 150, starTexture);
 
-	this->numberOfStalactites = 1;
+	this->numberOfStalactites = 6;
 	this->stalactites = new Obstacle[this->numberOfStalactites];
-	this->stalactites[0] = Obstacle(1700, 1000, 50, 150, stalactiteTexture);
+	this->stalactites[0] = Obstacle(1160, 670, 60, 150, stalactiteTexture);
+	this->stalactites[1] = Obstacle(1230, 670, 60, 150, stalactiteTexture);
+	this->stalactites[2] = Obstacle(1300, 670, 60, 150, stalactiteTexture);
+	this->stalactites[3] = Obstacle(3250, 1060, 60, 150, stalactiteTexture);
+	this->stalactites[4] = Obstacle(3320, 1060, 60, 150, stalactiteTexture);
+	this->stalactites[5] = Obstacle(3990, 1230, 80, 190, stalactiteTexture);
 }
 
 void World::Draw(SDL_Renderer* renderer, const SDL_Rect* camera)

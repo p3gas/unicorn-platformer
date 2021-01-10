@@ -9,11 +9,12 @@ class TopBar
 private:
 	SDL_Rect bar;
 	TextPrinter textPrinter;
+	SDL_Texture* heartTexture;
 	char* pathToFont;
 public:
 	void Init(const Configuration* configuration);
 	void Render(SDL_Renderer* renderer, float timer, int numberOfLives);
-	void LoadResources(const Configuration* configuration);
+	void LoadResources(const Configuration* configuration, SDL_Texture* heartTexture);
 	void Quit();
 };
 
