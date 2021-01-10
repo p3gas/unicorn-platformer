@@ -13,13 +13,13 @@ void World::Build()
 	this->platforms[3] = SDL_Rect{ -256, 1500, 256, 80 };
 
 	this->numberOfObstacles = 6;
-	this->obstacles = new SDL_Rect[this->numberOfObstacles];
-	this->obstacles[0] = SDL_Rect{ 800, 1400, 100, 100 };
-	this->obstacles[1] = SDL_Rect{ 1900, 1000, 100, 100 };
-	this->obstacles[2] = SDL_Rect{ 3100, 1350, 100, 100 };
-	this->obstacles[3] = SDL_Rect{ 4000, 900, 100, 100 };
-	this->obstacles[4] = SDL_Rect{ 4700, 1200, 100, 100 };
-	this->obstacles[5] = SDL_Rect{ 5840, 1400, 100, 100 };
+	this->stars = new SDL_Rect[this->numberOfObstacles];
+	this->stars[0] = SDL_Rect{ 800, 1400, 100, 100 };
+	this->stars[1] = SDL_Rect{ 1900, 1000, 100, 100 };
+	this->stars[2] = SDL_Rect{ 3100, 1350, 100, 100 };
+	this->stars[3] = SDL_Rect{ 4000, 900, 100, 100 };
+	this->stars[4] = SDL_Rect{ 4700, 1200, 100, 100 };
+	this->stars[5] = SDL_Rect{ 5840, 1400, 100, 100 };
 }
 
 void World::Draw(SDL_Renderer* renderer, const SDL_Rect* camera)
@@ -37,10 +37,10 @@ void World::Draw(SDL_Renderer* renderer, const SDL_Rect* camera)
 	for (int i = 0; i < this->numberOfObstacles; i++)
 	{
 		SDL_Rect objectToBeDrew;
-		objectToBeDrew.w = this->obstacles[i].w;
-		objectToBeDrew.h = this->obstacles[i].h;
-		objectToBeDrew.x = this->obstacles[i].x - camera->x;
-		objectToBeDrew.y = this->obstacles[i].y - camera->y;
+		objectToBeDrew.w = this->stars[i].w;
+		objectToBeDrew.h = this->stars[i].h;
+		objectToBeDrew.x = this->stars[i].x - camera->x;
+		objectToBeDrew.y = this->stars[i].y - camera->y;
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderFillRect(renderer, &objectToBeDrew);
 		SDL_SetRenderDrawColor(renderer, 255, 255, 0, SDL_ALPHA_OPAQUE);
@@ -61,7 +61,7 @@ int World::GetLevelHeight()
 void World::Destroy()
 {
 	delete[]this->platforms;
-	delete[]this->obstacles;
+	delete[]this->stars;
 }
 
 int World::AdjustPlayerPosition(Player* player)
@@ -72,7 +72,7 @@ int World::AdjustPlayerPosition(Player* player)
 		int collision = this->CheckIntersection(*player, this->platforms[i]);
 		if (collision == FROM_UP)
 		{
-			player->SetPosition(player->GetBody().x, this->platforms[i].y - player->GetBody().h);
+			player->CorrectPosition(player->GetBody().x, this->platforms[i].y - player->GetBody().h);
 		}
 		else if (collision != NONE)
 		{
@@ -101,11 +101,12 @@ int World::AdjustPlayerPosition(Player* player)
 	return NOTHING;
 }
 
-bool World::IsCollidingWithObstacle(Player* player)
+bool World::IsCollidingWithStar(Player* player)
 {
 	for (int i = 0; i < this->numberOfObstacles; i++)
 	{
-		if (this->CheckIntersection(*player, this->obstacles[i]) != NONE)
+		int intersectionType = this->CheckIntersection(*player, this->stars[i]);
+		if (intersectionType != NONE && intersectionType != INNER)
 		{
 			return true;
 		}
@@ -139,7 +140,8 @@ int World::CheckIntersection(Player player, SDL_Rect obstacle)
 		{
 			return FROM_RIGHT;
 		}
-		printf("INNER:\nplayer.x = %d\nplayer.y = %d\nplayer.oldX = %d\nplayer.oldY = %d\n\n", player.GetBody().x, player.GetBody().y, player.GetOldPosition().x, player.GetOldPosition().y);
+		printf("LEFT DATA:\nw = %d, obs.x = %d\n", player.GetBody().w, obstacle.x);
+		printf("INNER:\nx = %d, o_x = %d\ny = %d, o_y = %d\n\n", player.GetBody().x, player.GetOldPosition().x, player.GetBody().y, player.GetOldPosition().y);
 		return INNER;
 	}
 	return NONE;

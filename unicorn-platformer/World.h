@@ -16,7 +16,7 @@ private:
 	int numberOfObstacles;
 	SDL_Point startPosition;
 	SDL_Rect* platforms = NULL;
-	SDL_Rect* obstacles = NULL;
+	SDL_Rect* stars = NULL;
 public:
 	int GetLevelWidth();
 	int GetLevelHeight();
@@ -24,7 +24,7 @@ public:
 	void Draw(SDL_Renderer *renderer, const SDL_Rect* camera);
 	void Destroy();
 	int AdjustPlayerPosition(Player* player);
-	bool IsCollidingWithObstacle(Player* player);
+	bool IsCollidingWithStar(Player* player);
 	SDL_Point GetStartPosition();
 private:
 	int CheckIntersection(Player player, SDL_Rect obstacle);

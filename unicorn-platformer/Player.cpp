@@ -10,13 +10,14 @@ Player::Player()
 	gravity = 0.6f;
 	isJumping = false;
 	availableJumps = 2;
-	jumpRange = 300;
+	jumpRange = 400;
 	jumpKeyIsHold = false;
 	dashRange = 400;
 	dashSpeed = 4.0f;
 	dashCooldownLeft = 0;
 	dashCooldown = 1000;
 	dashTraveled = 0;
+	lives = 3;
 }
 
 void Player::Move(int x, int y)
@@ -209,6 +210,36 @@ void Player::Ground()
 	this->isGrounded;
 	this->jumpTraveled = 0;
 	this->availableJumps = 2;
+}
+
+bool Player::IsDashing()
+{
+	return this->isDashing;
+}
+
+int Player::GetNumberOfLives()
+{
+	return this->lives;
+}
+
+bool Player::Dies()
+{
+	if (--this->lives <= 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+void Player::ResetLives()
+{
+	this->lives = 3;
+}
+
+void Player::CorrectPosition(int x, int y)
+{
+	this->body.x = x;
+	this->body.y = y;
 }
 
 void Player::Accelrate(int deltaTime)

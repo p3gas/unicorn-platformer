@@ -16,12 +16,14 @@ private:
 	SDL_Renderer* renderer = NULL;
 	Configuration* configuration;
 	SDL_Texture* backgroundTexture = NULL;
+	SDL_Texture* menuTexture = NULL;
 	Player player;
 	SDL_Rect camera;
 	World world;
 	TextPrinter textPrinter;
 	bool isRunning = false;
 	float timer = 0.0f;
+	int gameState;
 public:
 	GameManager(Configuration* configuration);
 	int Init();
@@ -36,3 +38,7 @@ private:
 	SDL_Texture* LoadTexture(const char* path);
 };
 
+enum GameState {
+	MENU = 1,
+	GAME
+};

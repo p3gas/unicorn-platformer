@@ -20,6 +20,7 @@ private:
 	float aSpeed;
 	float aMaxSpeed;
 	float aAccelration;
+	int lives;
 	// JUMPING
 	float gravity;
 	float jumpForce;
@@ -51,6 +52,11 @@ public:
 	void ChangeControlMode();
 	void Reset();
 	void Ground();
+	bool IsDashing();
+	int GetNumberOfLives();
+	bool Dies();
+	void ResetLives();
+	void CorrectPosition(int x, int y);
 private:
 	void Accelrate(int deltaTime);
 };

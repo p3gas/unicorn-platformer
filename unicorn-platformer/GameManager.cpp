@@ -5,6 +5,7 @@ GameManager::GameManager(Configuration* configuration)
 	this->configuration = configuration;
 	this->camera.w = configuration->screenWidth;
 	this->camera.h = configuration->screenHeight;
+	this->gameState = MENU;
 }
 
 int GameManager::Init()
@@ -52,6 +53,12 @@ int GameManager::LoadResources()
 		printf("Unable to load texture from: %s\n", this->configuration->backgroundTexturePath);
 		return 10;
 	}
+	this->menuTexture = this->LoadTexture(this->configuration->menuTexturePath);
+	if (this->menuTexture == NULL)
+	{
+		printf("Unable to load texture from: %s\n", this->configuration->menuTexturePath);
+		return 11;
+	}
 	this->world.Build();
 	this->textPrinter.LoadFont(this->configuration->pathToFont);
 	this->player.SetTexture(this->LoadTexture(this->configuration->playerTexturePath));
@@ -74,35 +81,61 @@ void GameManager::ProcessInput()
 				this->isRunning = false;
 				break;
 			case SDLK_n:
-				this->RestartGame();
+				if (this->gameState == GAME)
+				{
+					this->RestartGame();
+					this->player.ResetLives();
+				}
 				break;
 			case SDLK_d:
-				this->player.ChangeControlMode();
+				if (this->gameState == GAME)
+				{
+					this->player.ChangeControlMode();
+				}
 				break;
-			}
+			case SDLK_SPACE:
+				if (this->gameState == MENU)
+				{
+					this->RestartGame();
+					this->player.ResetLives();
+					this->gameState = GAME;
+				}
+				break;
+			}			
 		}
 	}
 }
 
 void GameManager::Update(int deltaTime)
 {
-	this->timer += deltaTime / 1000.f;
-	this->player.Update(deltaTime);
+	if (this->gameState == GAME)
+	{
+		this->timer += deltaTime / 1000.f;
+		this->player.Update(deltaTime);
 
-	if (this->world.AdjustPlayerPosition(&this->player) == PLAYER_DEATH)
-	{
-		this->RestartGame();
-	}
-	if (this->world.IsCollidingWithObstacle(&this->player))
-	{
-		this->RestartGame();
-	}
+		if (this->world.AdjustPlayerPosition(&this->player) == PLAYER_DEATH)
+		{
+			if (this->player.Dies())
+			{
+				this->gameState = MENU;
+			}
+			this->RestartGame();
+		}
+		if (!this->player.IsDashing() && this->world.IsCollidingWithStar(&this->player))
+		{
+			if (this->player.Dies())
+			{
+				this->gameState = MENU;
+			}
+			this->RestartGame();
+		}
 
-	this->camera.x = this->player.GetOriginX() - this->configuration->screenWidth / 5;
-	this->camera.y = this->player.GetOriginY() - this->configuration->screenHeight / 2;
-	if (this->camera.y < -this->configuration->topBarHight)
-	{
-		this->camera.y = -this->configuration->topBarHight;
+		this->camera.x = this->player.GetOriginX() - this->configuration->screenWidth / 8;
+		this->camera.y = this->player.GetOriginY() - this->configuration->screenHeight / 2;
+		if (this->camera.y < -this->configuration->topBarHight)
+		{
+			this->camera.y = -this->configuration->topBarHight;
+		}
 	}
 }
 
@@ -110,21 +143,32 @@ void GameManager::Render()
 {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(this->renderer);
-	SDL_RenderCopy(this->renderer, this->backgroundTexture, NULL, NULL);
-	this->player.Draw(this->renderer, &this->camera);
-	SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-	this->world.Draw(this->renderer, &this->camera);
-	
-	SDL_Rect topBar;
-	topBar.x = 0;
-	topBar.y = 0;
-	topBar.w = this->configuration->screenWidth;
-	topBar.h = this->configuration->topBarHight;
-	SDL_SetRenderDrawColor(this->renderer, 150, 0, 255, SDL_ALPHA_OPAQUE);
-	SDL_RenderFillRect(this->renderer, &topBar);
-	char textTimer[8];
-	sprintf(textTimer, "%05.1f", this->timer);
-	this->textPrinter.Draw(this->renderer, SDL_Color{255, 255, 255, 255}, textTimer, SDL_Rect{ this->configuration->screenWidth - 200, 0, 200, 100 });
+
+	if (this->gameState == GAME)
+	{		
+		SDL_RenderCopy(this->renderer, this->backgroundTexture, NULL, NULL);
+		this->player.Draw(this->renderer, &this->camera);
+		SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+		this->world.Draw(this->renderer, &this->camera);
+
+		SDL_Rect topBar;
+		topBar.x = 0;
+		topBar.y = 0;
+		topBar.w = this->configuration->screenWidth;
+		topBar.h = this->configuration->topBarHight;
+		SDL_SetRenderDrawColor(this->renderer, 150, 0, 255, SDL_ALPHA_OPAQUE);
+		SDL_RenderFillRect(this->renderer, &topBar);
+		char textTimer[8];
+		sprintf(textTimer, "%05.1f", this->timer);
+		this->textPrinter.Draw(this->renderer, SDL_Color{255, 255, 255, 255}, textTimer, SDL_Rect{ this->configuration->screenWidth - 200, 0, 200, 100 });
+		char lives[3];
+		sprintf(lives, "%d", this->player.GetNumberOfLives());
+		this->textPrinter.Draw(this->renderer, SDL_Color{255, 255, 255, 255}, lives, SDL_Rect{ 0, 0, 200, 100 });
+	}
+	else if (this->gameState == MENU)
+	{
+		SDL_RenderCopy(this->renderer, this->menuTexture, NULL, NULL);
+	}
 
 	SDL_RenderPresent(this->renderer);
 }
@@ -133,6 +177,8 @@ void GameManager::Quit()
 {
 	SDL_DestroyTexture(this->backgroundTexture);
 	this->backgroundTexture = NULL;
+	SDL_DestroyTexture(this->menuTexture);
+	this->menuTexture = NULL;
 	SDL_DestroyWindow(this->window);
 	this->window = NULL;
 	SDL_DestroyRenderer(this->renderer);
