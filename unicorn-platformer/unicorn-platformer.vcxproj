@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="Jump.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TextPrinter.cpp" />
@@ -137,6 +138,7 @@
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="Jump.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TextPrinter.h" />
     <ClInclude Include="World.h" />

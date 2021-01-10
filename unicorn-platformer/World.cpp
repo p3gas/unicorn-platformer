@@ -3,21 +3,23 @@
 
 void World::Build()
 {
-	this->numberOfPlatforms = 3;
+	this->numberOfPlatforms = 4;
 	this->levelWidth = 5040;
+	this->startPosition = SDL_Point{ 0, 1500 };
 	this->platforms = new SDL_Rect[this->numberOfPlatforms];
-	this->platforms[0] = this->CreateRect(0, 700, 5040, 80);
-	this->platforms[1] = this->CreateRect(5040, 700, 1280, 80);
-	this->platforms[2] = this->CreateRect(-256, 700, 256, 80);
+	this->platforms[0] = SDL_Rect{ 0, 1500, 5040, 80 };
+	this->platforms[1] = SDL_Rect{ 5040, 1500, 1280, 80 };
+	this->platforms[2] = SDL_Rect{ 1700, 1200, 1280, 80 };
+	this->platforms[3] = SDL_Rect{ -256, 1500, 256, 80 };
 
 	this->numberOfObstacles = 6;
 	this->obstacles = new SDL_Rect[this->numberOfObstacles];
-	this->obstacles[0] = this->CreateRect(800, 600, 100, 100);
-	this->obstacles[1] = this->CreateRect(1900, 600, 100, 100);
-	this->obstacles[2] = this->CreateRect(3100, 600, 100, 100);
-	this->obstacles[3] = this->CreateRect(4000, 600, 100, 100);
-	this->obstacles[4] = this->CreateRect(4700, 600, 100, 100);
-	this->obstacles[5] = this->CreateRect(5840, 600, 100, 100);
+	this->obstacles[0] = SDL_Rect{ 800, 1400, 100, 100 };
+	this->obstacles[1] = SDL_Rect{ 1900, 1000, 100, 100 };
+	this->obstacles[2] = SDL_Rect{ 3100, 1350, 100, 100 };
+	this->obstacles[3] = SDL_Rect{ 4000, 900, 100, 100 };
+	this->obstacles[4] = SDL_Rect{ 4700, 1200, 100, 100 };
+	this->obstacles[5] = SDL_Rect{ 5840, 1400, 100, 100 };
 }
 
 void World::Draw(SDL_Renderer* renderer, const SDL_Rect* camera)
@@ -62,26 +64,48 @@ void World::Destroy()
 	delete[]this->obstacles;
 }
 
-void World::AdjustPlayerPosition(Player* player)
+int World::AdjustPlayerPosition(Player* player)
 {
+	bool isPlayerGrounded = false;
 	for (int i = 0; i < this->numberOfPlatforms; i++)
 	{
-		if (this->IsColliding(player->GetBody(), this->platforms[i]))
+		int collision = this->CheckIntersection(*player, this->platforms[i]);
+		if (collision == FROM_UP)
 		{
 			player->SetPosition(player->GetBody().x, this->platforms[i].y - player->GetBody().h);
+		}
+		else if (collision != NONE)
+		{
+			return PLAYER_DEATH;
+		}
+		if (this->IsGrounded(*player, this->platforms[i]))
+		{
+			isPlayerGrounded = true;
 		}
 	}
 	if (player->GetBody().x > this->levelWidth)
 	{
-		player->SetPosition(this->levelWidth - player->GetBody().x, player->GetBody().y);
+		player->SetPosition(player->GetBody().x - this->levelWidth, player->GetBody().y);
+
 	}
+	
+	if (isPlayerGrounded)
+	{
+		player->Ground();
+	}
+	else
+	{
+		player->isGrounded = false;
+	}
+
+	return NOTHING;
 }
 
 bool World::IsCollidingWithObstacle(Player* player)
 {
 	for (int i = 0; i < this->numberOfObstacles; i++)
 	{
-		if (this->IsColliding(player->GetBody(), this->obstacles[i]))
+		if (this->CheckIntersection(*player, this->obstacles[i]) != NONE)
 		{
 			return true;
 		}
@@ -89,20 +113,43 @@ bool World::IsCollidingWithObstacle(Player* player)
 	return false;
 }
 
-SDL_Rect World::CreateRect(int x, int y, int width, int height)
+SDL_Point World::GetStartPosition()
 {
-	SDL_Rect rect;
-	rect.x = x;
-	rect.y = y;
-	rect.w = width;
-	rect.h = height;
-	return rect;
+	return this->startPosition;
 }
 
-bool World::IsColliding(SDL_Rect body1, SDL_Rect body2)
+int World::CheckIntersection(Player player, SDL_Rect obstacle)
 {
-	if (body1.x < body2.x + body2.w && body1.x + body1.w > body2.x &&
-		body1.y < body2.y + body2.h && body1.y + body1.h > body2.y)
+	if (player.GetBody().x < obstacle.x + obstacle.w && player.GetBody().x + player.GetBody().w > obstacle.x &&
+		player.GetBody().y < obstacle.y + obstacle.h && player.GetBody().y + player.GetBody().h > obstacle.y)
+	{
+		if (player.GetOldPosition().y + player.GetBody().h <= obstacle.y)
+		{
+			return FROM_UP;
+		}
+		if (player.GetOldPosition().y >= obstacle.y + obstacle.h)
+		{
+			return FROM_DOWN;
+		}
+		if (player.GetOldPosition().x + player.GetBody().w <= obstacle.x)
+		{
+			return FROM_LEFT;
+		}
+		if (player.GetOldPosition().x >= obstacle.x + obstacle.w)
+		{
+			return FROM_RIGHT;
+		}
+		printf("INNER:\nplayer.x = %d\nplayer.y = %d\nplayer.oldX = %d\nplayer.oldY = %d\n\n", player.GetBody().x, player.GetBody().y, player.GetOldPosition().x, player.GetOldPosition().y);
+		return INNER;
+	}
+	return NONE;
+}
+
+bool World::IsGrounded(Player player, SDL_Rect platform)
+{
+	if (((player.GetBody().x >= platform.x && player.GetBody().x <= platform.x + platform.w)
+		|| (player.GetBody().x + player.GetBody().w >= platform.x && player.GetBody().x + player.GetBody().w <= platform.x + platform.w))
+		&& player.GetBody().y + player.GetBody().h == platform.y)
 	{
 		return true;
 	}

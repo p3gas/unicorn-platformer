@@ -1,5 +1,7 @@
-﻿  GameManager.cpp
-  main.cpp
-E:\Projekty\unicorn-platformer\unicorn-platformer\main.cpp(31,51): warning C4244: "argument": konwersja z "float" do "Uint32", możliwa utrata danych
-  Generowanie kodu...
+﻿  Player.cpp
+E:\Projekty\unicorn-platformer\unicorn-platformer\Player.cpp(97,19): warning C4244: "inicjowanie": konwersja z "float" do "int", możliwa utrata danych
+E:\Projekty\unicorn-platformer\unicorn-platformer\Player.cpp(100,30): warning C4244: "=": konwersja z "int" do "float", możliwa utrata danych
+E:\Projekty\unicorn-platformer\unicorn-platformer\Player.cpp(132,14): warning C4244: "inicjowanie": konwersja z "float" do "int", możliwa utrata danych
+E:\Projekty\unicorn-platformer\unicorn-platformer\Player.cpp(135,24): warning C4244: "=": konwersja z "int" do "float", możliwa utrata danych
+E:\Projekty\unicorn-platformer\unicorn-platformer\Player.cpp(139,26): warning C4244: "+=": konwersja z "float" do "int", możliwa utrata danych
   unicorn-platformer.vcxproj -> E:\Projekty\unicorn-platformer\x64\Debug\unicorn-platformer.exe

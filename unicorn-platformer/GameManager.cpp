@@ -76,6 +76,9 @@ void GameManager::ProcessInput()
 			case SDLK_n:
 				this->RestartGame();
 				break;
+			case SDLK_d:
+				this->player.ChangeControlMode();
+				break;
 			}
 		}
 	}
@@ -86,7 +89,10 @@ void GameManager::Update(int deltaTime)
 	this->timer += deltaTime / 1000.f;
 	this->player.Update(deltaTime);
 
-	this->world.AdjustPlayerPosition(&this->player);
+	if (this->world.AdjustPlayerPosition(&this->player) == PLAYER_DEATH)
+	{
+		this->RestartGame();
+	}
 	if (this->world.IsCollidingWithObstacle(&this->player))
 	{
 		this->RestartGame();
@@ -149,7 +155,8 @@ bool GameManager::IsRunning()
 void GameManager::RestartGame()
 {
 	this->timer = 0.0f;
-	this->player.SetPosition(0, this->configuration->screenHeight - this->player.GetBody().h);
+	this->player.SetPosition(this->world.GetStartPosition().x, this->world.GetStartPosition().y - this->player.GetBody().h);
+	this->player.Reset();
 }
 
 SDL_Texture* GameManager::LoadTexture(const char* path)
